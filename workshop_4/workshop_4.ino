@@ -3,10 +3,10 @@
 
     APDS9301 apds;
 
-    #define INT_PIN 2 // We'll connect the INT pin from our sensor to the
-                      // INT0 interrupt pin on the Arduino.
-    bool lightIntHappened = false; // flag set in the interrupt to let the
-                     //  mainline code know that an interrupt occurred.
+    #define INT_PIN 2                
+                                     
+    bool lightIntHappened = false;   
+                                     
 
 
 
@@ -26,53 +26,46 @@
 #define DEVICE_CREDENTIAL "0NB5y3AUK1jQ"
 
 
-#define SSID "guillaume"
-#define SSID_PASSWORD "guillaume25"
+#define SSID "guillaume"                                         //network's name
+#define SSID_PASSWORD "guillaume25"                              //network's password
 
 ThingerWifi thing(USERNAME, DEVICE_ID, DEVICE_CREDENTIAL);
 
 void setup() {
   Serial.begin(9600);
-  // configure wifi network
-  thing.add_wifi(SSID, SSID_PASSWORD);
+                                            
+  thing.add_wifi(SSID, SSID_PASSWORD);                         // configure wifi network
 
   pinMode(LED_BUILTIN, OUTPUT);
 
-  // pin control example (i.e. turning on/off a light, a relay, etc)
-  thing["test_nom"] << digitalPin(LED_BUILTIN);
+  
+  thing["test_nom"] << digitalPin(LED_BUILTIN);                //setup pin control turning on/off a light on the card
 
   
-  thing["capteur lumiere"] >> [](pson& out){
+  thing["capteur lumiere"] >> [](pson& out){                    //setup the streaming data to the server
     out["luminous flux"] = apds.readCH0Level();
   };
   
   
   
-  delay(5);    // The CCS811 need  a brief delay after startup.
+  delay(5);                                                     // The CCS811 need  a brief delay after startup.
       Serial.begin(9600);
       Wire.begin();
     
-      // APDS9301 sensor setup.
-      apds.begin(0x39);  // We're assuming you haven't changed the I2C
-                         //  address from the default by soldering the
-                         //  jumper on the back of the board.
-      apds.setGain(APDS9301::LOW_GAIN); // Set the gain to low. Strictly
-                         //  speaking, this isn't necessary, as the gain
-                         //  defaults to low.
-      apds.setIntegrationTime(APDS9301::INT_TIME_13_7_MS); // Set the
-                         //  integration time to the shortest interval.
-                         //  Again, not strictly necessary, as this is
-                         //  the default.
-      apds.setLowThreshold(0); // Sets the low threshold to 0, effectively
-                         //  disabling the low side interrupt.
-      apds.setHighThreshold(50); // Sets the high threshold to 500. This
-                         //  is an arbitrary number I pulled out of thin
-                         //  air for purposes of the example. When the CH0
-                         //  reading exceeds this level, an interrupt will
-                         //  be issued on the INT pin.
-      apds.setCyclesForInterrupt(1); // A single reading in the threshold
-                         //  range will cause an interrupt to trigger.
-      apds.enableInterrupt(APDS9301::INT_ON); // Enable the interrupt.
+                                                               // APDS9301 sensor setup.
+      apds.begin(0x39);                                        // I2C default's address   
+                                                    
+      apds.setGain(APDS9301::LOW_GAIN);                        // Set the gain to low
+                         
+      apds.setIntegrationTime(APDS9301::INT_TIME_13_7_MS);     // Set the integration time to the shortest interval.
+                        
+      apds.setLowThreshold(0);                                 // Sets the low threshold to 0, effectively
+                         
+      apds.setHighThreshold(50);                               // Sets the high threshold to 500. This
+                         
+      apds.setCyclesForInterrupt(1);                           // A single reading in the threshold
+                         
+      apds.enableInterrupt(APDS9301::INT_ON);                  // Enable the interrupt.
       apds.clearIntFlag();
       
       
@@ -83,18 +76,17 @@ void setup() {
 
 void loop() {
   thing.handle();
-  thing.stream(thing["capteur lumiere"]);
+  thing.stream(thing["capteur lumiere"]);                       //send data to the server
    static unsigned long outLoopTimer = 0;
       apds.clearIntFlag();                          
 
-      // This is a once-per-second timer that calculates and prints off
-      //  the current lux reading.
-      if (millis() - outLoopTimer >= 1000)
+      
+      if (millis() - outLoopTimer >= 1000)                      // Print lux reading once-per-second
       {
         outLoopTimer = millis();
     
         Serial.print("Luminous flux: ");
-        Serial.println(apds.readCH0Level(),6);
+        Serial.println(apds.readCH0Level(),6);                  //Print lux
 
         if (lightIntHappened)
         {
