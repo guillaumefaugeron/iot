@@ -1,3 +1,9 @@
+/*
+ * Workshop 
+ * By Julien Khabbaz, guillaume Faugeron, Quentin Fayet
+ * On the loop we have two functions. 
+*/
+
 #include "Wire.h"
     #include <Sparkfun_APDS9301_Library.h>
 
